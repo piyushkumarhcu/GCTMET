@@ -1,1 +1,1 @@
-# GCTMET
+# GCTMET algorithm with CORDIC
