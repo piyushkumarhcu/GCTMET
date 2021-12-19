@@ -18,7 +18,7 @@ void cordic(THETA_TYPE theta, COS_SIN_TYPE &s, COS_SIN_TYPE &c){
 
 
 
-  if (theta <= pi/2){
+  if ((theta >= 0) && (theta <= pi/2)){
       quadrant = QUAD1;
       z =theta;
    }
