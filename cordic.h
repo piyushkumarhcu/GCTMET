@@ -1,74 +1,18 @@
-#include "cordic.h"
+#ifndef _CORDIC_H_
+#define _CORDIC_H_
+#include "ap_fixed.h"
 
-void cordic(THETA_TYPE theta, COS_SIN_TYPE &s, COS_SIN_TYPE &c){
-#pragma HLS PIPELINE II=9
+typedef unsigned int UINTYPE_12;
+typedef ap_fixed<32, 20> THETA_TYPE;
+typedef ap_fixed<32, 20> COS_SIN_TYPE;
+const 	ap_uint<5> NUM_ITERATIONS=10;
 
-  ap_uint<4> QUAD1 = 1;
-  ap_uint<4> QUAD2 = 2;
-  ap_uint<4> QUAD3 = 3;
-  ap_uint<4> QUAD4 = 4;
-  ap_uint<4> quadrant;
-  THETA_TYPE z;
+static  THETA_TYPE cordic_phase[10]={0.78539816339744828000, 0.46364760900080609000,
+									 0.24497866312686414000, 0.12435499454676144000,
+									 0.06241880999595735000, 0.03123983343026827700,
+									 0.01562372862047683100, 0.00781234106010111110,
+									 0.00390623013196697180, 0.00195312251647881880};
 
+void cordic(THETA_TYPE theta, COS_SIN_TYPE &s, COS_SIN_TYPE &c);
+#endif
 
-  COS_SIN_TYPE current_cos = 0.6073;
-  COS_SIN_TYPE current_sin = 0.0;
-  COS_SIN_TYPE factor = 1.0;
-  COS_SIN_TYPE pi = 3.1415926;
-
-
-
-  if (theta <= pi/2){
-      quadrant = QUAD1;
-      z =theta;
-   }
-  else if ((theta > pi/2) && (theta<=pi)){
-	  quadrant = QUAD2;
-      z = (pi - theta);
-   }
-
-   /*else if (theta <= 4.71239)
-      {
-      quadrant = QUAD3;
-      z = (theta - 3.14159);
-      }
-    else if (theta > 4.71239) && (theta <= 6.28319))
-      {
-      quadrant = QUAD4;
-      z = (6.28319 - theta);
-      }*/
-
-
-  for (ap_uint<5> j = 0; j < NUM_ITERATIONS; j++) {
-
-
-       #pragma HLS unroll
-       ap_int<4> sigma = (z < 0) ? -1 : 1;
-
-
-
-      COS_SIN_TYPE cos_shift = current_cos * sigma * factor;
-      COS_SIN_TYPE sin_shift = current_sin * sigma * factor;
-
-
-      current_cos = current_cos - sin_shift;
-
-      current_sin = current_sin + cos_shift;
-
-
-      z = z - sigma * cordic_phase[j];
-
-      factor = factor/2;
-
-  }
-  
-  s = current_sin;
-  if(QUAD1 == quadrant){
-	  c = current_cos;
-  }
-  else{
-	  c = -current_cos;
-  }
-
-
-}
